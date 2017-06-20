@@ -1,0 +1,56 @@
+runtime: nodejs
+env: flex
+service: default
+# skip_files: 
+#   - regex
+
+manual_scaling:
+  instances: 1      # single node process on 1 machine?
+
+env_variables:
+  MLAB_EP: 'endpoint of mlab database'
+
+resources:          # minima
+  cpu: 1            # number of cores
+  memory_gb: 0.5    # cpu * 0.9 - 0.4
+  disk_size_gb: 10  # 10
+
+health_check:       # all defaults
+  enable_health_check: True
+  check_interval_sec: 1
+  timeout_sec: 1
+  unhealthy_threshold: 1
+  healthy_threshold: 1
+  restart_treshold: 300
+
+network:
+  instance_tag: socketbroker
+  forwarded_ports:
+    - 65080/tcp
+# name: default  # VPC name VM instance is assigned to
+
+######################################################
+
+# gcloud nodejs websocket server on gae:
+# https://github.com/GoogleCloudPlatform/nodejs-docs-samples/tree/master/appengine/websockets
+# https://medium.com/google-cloud/a-node-js-websocket-server-on-google-app-engine-c6c32a486e9a
+
+# protocol forwarding:
+# https://cloud.google.com/compute/docs/protocol-forwarding/
+
+# set a firewall rule to allow port forwarding:
+# gcloud compute firewall-rules create default-allow-websockets \
+#   --allow tcp:65080 \
+#   --target-tags socketbroker \
+#   --description "Allow websocket traffic on port 65080"
+
+# ip adresses:
+# https://cloud.google.com/compute/docs/ip-addresses
+
+# estimate gcloud billing costs:
+# https://cloud.google.com/products/calculator/
+
+# save money on gcloud flex env:
+# gcloud app deploy --version dev  # development version
+# gcloud app versions stop dev     # stop it after coding
+# gcloud app versions start dev    # restart it 4 coding
