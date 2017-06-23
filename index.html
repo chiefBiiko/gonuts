@@ -1,0 +1,50 @@
+<!-- client html -->
+
+<!DOCTYPE HTML>
+
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>client html</title>
+</head>
+<body>
+  
+  <!-- message board -->
+  <div id="log"></div>
+  
+  <!-- message form -->
+  <form id="msgform" accept-charset="utf-8">
+    <input type="text" id="msginput" placeholder="Enter a message" required/>
+    <input type="submit" id="btn" value="Send!" />
+  </form>
+  
+  <!-- socket.io-client js -->
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <!-- client js -->
+  <script type="text/javascript" charset="utf-8">
+    'use strict;'
+    
+    // DOM objects
+    const log = window.document.getElementById('log');
+    const form = window.document.getElementById('msgform');
+    const input = window.document.getElementById('msginput');
+    const button = window.document.getElementById('btn');
+    
+    // initialize client connection to server
+    const socket = window.io('http://127.0.0.1');
+    
+    // in handler
+    socket.on('serverMsg', msg => log.innerText += msg + '\n');
+    
+    // click handler
+    button.onclick = e => {
+      e.preventDefault();
+      socket.emit('clientMsg', input.value)
+      input.value = '';
+    };
+    
+  </script>
+  
+</body>
+</html>

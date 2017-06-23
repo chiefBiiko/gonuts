@@ -1,6 +1,7 @@
 /* socketbroker */
 
 const net = require('net');
+
 /*
 const http = require('http');
 // TODO: REWRITE REQUEST STUFF WITH A HTTP GET CLIENT
@@ -82,7 +83,7 @@ const TCPserver = net.createServer(socket => {
   });
   
 });
-TCPserver.listen(65080, () => {  // forwarded port in VPC network on gcloud
+TCPserver.listen(65080, '127.0.0.1', () => {  // forwarded port in VPC network on gcloud
   global.console.log('net.server listening on port 65080');
 });
 // [END tcp_server]
