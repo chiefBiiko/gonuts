@@ -10,13 +10,17 @@
 <body>
   
   <!-- message board -->
-  <div id="log"></div>
+  <div id="msgboard"></div>
   
   <!-- message form -->
   <form id="msgform" accept-charset="utf-8">
-    <input type="text" id="msginput" placeholder="Enter a message" required/>
-    <input type="submit" id="btn" value="Send!" />
+    <input type="text" id="msginput" placeholder="$$419$$419$419$$$$419$" 
+    autofocus/>
+    <input type="submit" id="sendbtn" value="send!" />
   </form>
+  
+  <!-- log out -->
+  <button id="exitbtn">exit</button>
   
   <!-- socket.io-client js -->
   <script src="/socket.io/socket.io.js"></script>
@@ -26,22 +30,35 @@
     'use strict;'
     
     // DOM objects
-    const log = window.document.getElementById('log');
+    const board = window.document.getElementById('msgboard');
     const form = window.document.getElementById('msgform');
     const input = window.document.getElementById('msginput');
-    const button = window.document.getElementById('btn');
+    const sendbtn = window.document.getElementById('sendbtn');
+    const exitbtn = window.document.getElementById('exitbtn');
     
     // initialize client connection to server
-    const socket = window.io('http://127.0.0.1');
+    const socket = window.io.connect();  // external_ip:65080
     
     // in handler
-    socket.on('serverMsg', msg => log.innerText += msg + '\n');
+    socket.on('message', msg => board.innerText += `${msg}\n`);
     
     // click handler
-    button.onclick = e => {
+    sendbtn.onclick = e => {
       e.preventDefault();
-      socket.emit('clientMsg', input.value)
-      input.value = '';
+      if (/[^ ]+/.test(input.value)) {
+        socket.emit('message', input.value);
+        input.value = '';
+      }
+      input.focus();
+    };
+    
+    // exit handler
+    exitbtn.onclick = e => {
+      input.disabled = sendbtn.disabled = true;
+      exitbtn.style.visibility = 'hidden';
+      board.innerText += 'exit\n';
+      socket.disconnect();
+      // show auth/login/enterbtn
     };
     
   </script>

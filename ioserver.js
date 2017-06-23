@@ -10,7 +10,8 @@ function handler (req, res) {
       console.log('Error loading index.html');
       return res.end('Error loading index.html');
     }
-    res.writeHead(200);
+    console.log(`Serving html to ${req.headers.referer}`);  // ???
+    res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(data);
   });
 }
@@ -20,20 +21,22 @@ const io = require('socket.io')(server);
 
 io.on('connection', socket => {
   
-  console.log('CLIENT: ' + socket.id);
+  console.log(`Client: ${socket.id}`);
   
-  socket.emit('serverMsg', 'Hi client!');
+  socket.emit('message', `Hi client ${socket.id}`);
   
-  socket.on('clientmsg', data => {
-    console.log('DATA:' + data);
-    socket.emit('serverMsg', data);
+  socket.on('message', msg => {
+    console.log(`From ${socket.id}: ${msg}`);
+    socket.emit('message', `From ${socket.id}: ${msg}`);
   });
   
   socket.on('error', err => {
-    console.error('ERROR:' + err.message);
+    console.error(`Error: ${err.message}`);
   });
   
-  socket.on('disconnect', () => {});
+  socket.on('disconnect', info => {
+    console.log(info);
+  });
   
 });
 
