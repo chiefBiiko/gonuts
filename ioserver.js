@@ -4,16 +4,9 @@
 const fs = require('fs');
 
 function handler (req, res) {
-  fs.readFile(__dirname + '/index.html', (err, data) => {
-    if (err) {
-      res.writeHead(500);
-      console.log('Error loading index.html');
-      return res.end('Error loading index.html');
-    }
-    console.log(`Serving html to ${req.headers.referer}`);  // ???
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(data);
-  });
+  console.log(`Serving html to ${req.headers.referer}`);
+  res.writeHead(200, {'Content-Type': 'text/html'});
+  fs.createReadStream(`${__dirname}/index.html`).pipe(res);
 }
 
 const server = require('http').createServer(handler);
