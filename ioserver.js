@@ -1,12 +1,50 @@
 /* socket.io server */
+
 'use strict';
 
 const fs = require('fs');
 
-function handler (req, res) {
-  console.log(`Serving html to ${req.headers.referer}`);
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  fs.createReadStream(`${__dirname}/index.html`).pipe(res);
+function handler(req, res) {
+  // readstream from resource on GET
+  if (req.method === 'GET' && 
+      /^.*\/reg.html$|^.*\/log.html$|^.*\/chat.html$/.test(req.url)) {
+    var src;  // resource
+    const ep = req.url.replace(/.(?=.*\/)|\//g, '');
+    try {
+      src = fs.createReadStream(`${__dirname}/${ep}`);
+    } catch (err) {  // error handling when initializing readable
+      console.error(err);
+      res.statusCode = 500;
+      res.end();
+    }
+    // error handling when serving readable
+    src.on('error', err => {
+      console.error(err);
+      res.statusCode = 500;
+      res.end();
+    });
+    // pipe readable to response
+    console.log(`Serving html to ${req.headers.referer}`);
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    src.pipe(res);
+  } else if (req.url === '/reg' && req.method === 'POST') {
+    
+  } else if (req.url === '/log' && req.method === 'POST') {
+    
+  } else {
+    res.statusCode = 404;
+    res.end();
+  }
+
+  // error handler for request stream
+  req.on('error', err => {
+    console.error(err);
+    res.statusCode = 400;
+    res.end();
+  });
+  
+  // error handler for response stream
+  res.on('error', err => console.error(err));
 }
 
 const server = require('http').createServer(handler);
@@ -27,9 +65,7 @@ io.on('connection', socket => {
     console.error(`Error: ${err.message}`);
   });
   
-  socket.on('disconnect', info => {
-    console.log(info);
-  });
+  socket.on('disconnect', info => console.log(info));
   
 });
 

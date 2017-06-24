@@ -1,0 +1,67 @@
+<!-- chat html -->
+
+<!DOCTYPE HTML>
+
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>chat html</title>
+</head>
+<body>
+  
+  <!-- chat board -->
+  <div id="chatboard"></div>
+  
+  <!-- chat form -->
+  <form id="chatform" accept-charset="utf-8">
+    <input type="text" id="chatinput" placeholder="$$419$$419$419$$$$419$" 
+    autofocus/>
+    <input type="submit" id="chatbtn" value="chat!" />
+  </form>
+  
+  <!-- exitbtn -->
+  <button id="exitbtn">exit</button>
+  
+  <!-- socket.io-client js -->
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <!-- chat js -->
+  <script type="text/javascript" charset="utf-8">
+    'use strict;'
+    
+    // DOM objects
+    const board = window.document.getElementById('chatboard');
+    const form = window.document.getElementById('chatform');
+    const input = window.document.getElementById('chatinput');
+    const sendbtn = window.document.getElementById('chatbtn');
+    const exitbtn = window.document.getElementById('exitbtn');
+    
+    // initialize client connection to server
+    const socket = window.io.connect();  // external_ip:65080
+    
+    // in handler
+    socket.on('message', msg => board.innerText += `${msg}\n`);
+    
+    // click handler
+    sendbtn.onclick = e => {
+      e.preventDefault();
+      if (/[^ ]+/.test(input.value)) {
+        socket.emit('message', input.value);
+        input.value = '';
+      }
+      input.focus();
+    };
+    
+    // exit handler
+    exitbtn.onclick = e => {
+      input.disabled = sendbtn.disabled = true;
+      exitbtn.style.visibility = 'hidden';
+      board.innerText += 'exit\n';
+      socket.disconnect();
+      // show auth/login/enterbtn
+    };
+    
+  </script>
+  
+</body>
+</html>
