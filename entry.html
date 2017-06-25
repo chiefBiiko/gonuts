@@ -17,7 +17,7 @@
   
   <!-- login form -->
   <form id="logform" accept-charset="utf-8">
-    <input type="text" id="logname" placeholder="name" autofocus />
+    <input type="text" id="logname" placeholder="name" />
     <input type="password" id="pwinput1" placeholder="password" />
     <input type="submit" id="logbtn" value="login!" />
   </form>
@@ -47,16 +47,27 @@
     btn_login.onclick = e => {
       e.preventDefault();
       if ([inp_nm1, inp_pw1].every(i => /[^ ]+/.test(i.value))) {
+        
+        const myname = inp_nm1.value;
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/log', true);
+        xhr.open('POST', '/login', true);
         xhr.onload = e => {
-          if (xhr.status != 200) window.alert('xhr error');
-          window.alert('Login OK. GO TO CHAT.');
+          if (xhr.status === 401) {
+            window.alert('Invalid login.');
+            inp_nm1.focus();
+          } else if (xhr.status === 200) {
+            window.sessionStorage.setItem('myname', myname);
+            // render chatroom
+            window.document.open();
+            window.document.write(xhr.responseText);
+            window.document.close();
+          }
         };
         xhr.send(JSON.stringify({
           name: inp_nm1.value, 
           password: inp_pw1.value  // ENC PASSWORD!
         }));
+        
         inp_nm1.value = inp_pw1.value = '';
       } else {
         inp_nm1.focus();
@@ -67,21 +78,35 @@
       e.preventDefault();
       if ([inp_nm2, inp_pw2, inp_pw3].every(i => /[^ ]+/.test(i.value)) &&
           inp_pw2.value === inp_pw3.value) {
+        
+        const myname = inp_nm2.value;    
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/reg', true);
+        xhr.open('POST', '/register', true);
         xhr.onload = e => {
-          if (xhr.status != 200) window.alert('xhr error');
-          window.alert('Register OK. GO TO LOGIN.');
+          if (xhr.status === 423) {
+            window.alert('Username unavailable.');
+            inp_nm2.focus();
+          } else if (xhr.status === 200) {
+            window.sessionStorage.setItem('myname', myname);
+            // render chatroom
+            window.document.open();
+            window.document.write(xhr.responseText);
+            window.document.close();
+          }
         };
         xhr.send(JSON.stringify({
           name: inp_nm2.value, 
           password: inp_pw2.value  // ENC PASSWORD!
         }));
+        
         inp_nm2.value = inp_pw2.value = inp_pw3.value = '';
       } else {
         inp_nm2.focus();
       }
     };
+    
+    inp_nm1.value = window.sessionStorage.getItem('myname') || null;
+    inp_nm1.value ? inp_pw1.focus() : inp_nm1.focus();
     
   </script>
   

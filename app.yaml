@@ -26,7 +26,7 @@ health_check:       # all defaults
 network:
   instance_tag: socketbroker
   forwarded_ports:
-    - 65080/tcp
+    - 65080
 # name: default  # VPC name VM instance is assigned to
 
 ######################################################

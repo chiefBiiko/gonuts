@@ -6,16 +6,22 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <title>chat html</title>
+  <style>
+    form { margin: 10px 0 0 0; }
+    form > input { width: 100%; box-sizing: border-box; margin: 0 0 5px 0; }
+  </style>
 </head>
 <body>
+  
+  <h1>CHATROOM</h1>
   
   <!-- chat board -->
   <div id="chatboard"></div>
   
   <!-- chat form -->
   <form id="chatform" accept-charset="utf-8">
-    <input type="text" id="chatinput" placeholder="$$419$$419$419$$$$419$" 
-    autofocus/>
+    <input type="text" id="chatinput" placeholder="chat a round..." 
+    autocomplete="off"/>
     <input type="submit" id="chatbtn" value="chat!" />
   </form>
   
@@ -31,35 +37,42 @@
     
     // DOM objects
     const board = window.document.getElementById('chatboard');
-    const form = window.document.getElementById('chatform');
-    const input = window.document.getElementById('chatinput');
+    const form_chat = window.document.getElementById('chatform');
+    const inp_chat = window.document.getElementById('chatinput');
     const sendbtn = window.document.getElementById('chatbtn');
     const exitbtn = window.document.getElementById('exitbtn');
     
     // initialize client connection to server
     const socket = window.io.connect();  // external_ip:65080
     
+    // whoami on connect
+    socket.on('connect', () => {
+      socket.emit('whoami', window.sessionStorage.getItem('myname'));
+    });
+    
     // in handler
     socket.on('message', msg => board.innerText += `${msg}\n`);
     
     // click handler
-    sendbtn.onclick = e => {
+    form_chat.onsubmit = e => {
       e.preventDefault();
-      if (/[^ ]+/.test(input.value)) {
-        socket.emit('message', input.value);
-        input.value = '';
+      if (/[^ ]+/.test(inp_chat.value)) {
+        socket.emit('message', inp_chat.value);
+        inp_chat.value = '';
       }
-      input.focus();
+      inp_chat.focus();
     };
     
     // exit handler
     exitbtn.onclick = e => {
-      input.disabled = sendbtn.disabled = true;
+      inp_chat.disabled = sendbtn.disabled = true;
       exitbtn.style.visibility = 'hidden';
       board.innerText += 'exit\n';
       socket.disconnect();
       // show auth/login/enterbtn
     };
+    
+    inp_chat.focus();
     
   </script>
   

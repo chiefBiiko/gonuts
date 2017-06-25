@@ -3,16 +3,16 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 
 const db = {
-  /*
   chiefBiiko: {
-    contacts: ['chief', 'capo'],
-    password: '',
-    socketid: null
+    contacts: [],
+    password: '419'
   }
-  */
 };
+
+var sockets = [];
 
 function handler(req, res) {
   
@@ -28,7 +28,7 @@ function handler(req, res) {
   if (req.method === 'GET') {
     let src;  // resource
     try {
-      src = fs.createReadStream(`${__dirname}/entry.html`);
+      src = fs.createReadStream(path.join(__dirname, 'entry.html'));
     } catch (err) {  // error handling when initializing readable
       console.error(err);
       res.statusCode = 500;
@@ -41,7 +41,7 @@ function handler(req, res) {
       res.end();
     });
     // pipe readable to response
-    console.log(`Serving html to ${req.headers.referer}`);
+    console.log(`Serving html to ${req.headers.origin}`);
     res.writeHead(200, {'Content-Type': 'text/html'});
     src.pipe(res);
   } else if (req.method === 'POST') {
@@ -57,13 +57,66 @@ function handler(req, res) {
     });
     // use POST body data on end
     req.on('end', () => {
-      if (req.url === '/reg') {
-        console.log(body);
-      } else if (req.url === '/log') {
-        console.log(body);
+      const data = JSON.parse(body);
+      if (req.url === '/register') {
+        if (Object.keys(db).includes(data.name)) {
+          res.statusCode = 423;  // locked
+          res.end();
+        } else {
+          db[data.name] = {
+            contacts: [],
+            password: data.password,
+            socketid: ''
+          };
+          
+          let src;  // resource
+          try {
+            src = fs.createReadStream(path.join(__dirname, 'chat.html'));
+          } catch (err) {  // error handling when initializing readable
+            console.error(err);
+            res.statusCode = 500;
+            res.end();
+          }
+          // error handling when serving readable
+          src.on('error', err => {
+            console.error(err);
+            res.statusCode = 500;
+            res.end();
+          });
+          // pipe readable to response
+          console.log(`Serving html to ${req.headers.origin}`);
+          res.writeHead(200, {'Content-Type': 'text/html'});
+          src.pipe(res);
+          
+        }
+      } else if (req.url === '/login') {
+        if (Object.keys(db).includes(data.name) &&
+            db[data.name].password === data.password) {
+          
+          let src;  // resource
+          try {
+            src = fs.createReadStream(path.join(__dirname, 'chat.html'));
+          } catch (err) {  // error handling when initializing readable
+            console.error(err);
+            res.statusCode = 500;
+            res.end();
+          }
+          // error handling when serving readable
+          src.on('error', err => {
+            console.error(err);
+            res.statusCode = 500;
+            res.end();
+          });
+          // pipe readable to response
+          console.log(`Serving html to ${req.headers.origin}`);
+          res.writeHead(200, {'Content-Type': 'text/html'});
+          src.pipe(res);
+          
+        } else {
+          res.statusCode = 401;
+          res.end();
+        }
       }
-      res.statusCode = 200;
-      res.end();  // rather stream out chat.html
     });
   } else {
     res.statusCode = 404;
@@ -77,20 +130,27 @@ const io = require('socket.io')(server);
 
 io.on('connection', socket => {
   
-  console.log(`Client: ${socket.id}`);
-  
-  socket.emit('message', `Hi client ${socket.id}`);
+  socket.on('whoami', x => {
+    sockets.push([x, socket]);
+    console.log(`Client: ${x} with socketid ${socket.id}`);
+    socket.emit('message', `Hi ${x}`);
+  });
   
   socket.on('message', msg => {
-    console.log(`From ${socket.id}: ${msg}`);
-    socket.emit('message', `From ${socket.id}: ${msg}`);
+    const username = sockets.filter(s => s[1] === socket)[0][0];
+    console.log(`From ${username}: ${msg}`);
+    socket.emit('message', `From ${username}: ${msg}`);
   });
   
   socket.on('error', err => {
-    console.error(`Error: ${err.message}`);
+    console.error(`Error: ${err.message} in socket ${socket.id}`);
   });
   
-  socket.on('disconnect', info => console.log(info));
+  socket.on('disconnect', () => {
+    const username = sockets.filter(s => s[1] === socket)[0][0];
+    console.log(`DISCONNECT:\n ${username}`);
+    sockets = sockets.filter(s => s[1] !== socket);
+  });
   
 });
 
