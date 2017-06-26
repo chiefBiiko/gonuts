@@ -148,8 +148,9 @@ io.on('connection', socket => {
   
   socket.on('disconnect', () => {
     const username = sockets.filter(s => s[1] === socket)[0][0];
-    console.log(`DISCONNECT:\n ${username}`);
-    sockets = sockets.filter(s => s[1] !== socket);
+    console.log(`Disconnect:\n ${username}`);
+    sockets = sockets.filter(s => s[0] !== username);
+    socket = null;
   });
   
 });
