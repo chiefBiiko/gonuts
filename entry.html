@@ -37,14 +37,14 @@
     // DOM objects
     const inp_nm1 = window.document.getElementById('logname');
     const inp_pw1 = window.document.getElementById('pwinput1');
-    const btn_login = window.document.getElementById('logbtn');
+    const form_login = window.document.getElementById('logform');
     const inp_nm2 = window.document.getElementById('regname');
     const inp_pw2 = window.document.getElementById('pwinput2');
     const inp_pw3 = window.document.getElementById('pwinput3');
-    const btn_register = window.document.getElementById('regbtn');
+    const form_register = window.document.getElementById('regform');
     
     // event handlers
-    btn_login.onclick = e => {
+    form_login.onsubmit = e => {
       e.preventDefault();
       if ([inp_nm1, inp_pw1].every(i => /[^ ]+/.test(i.value))) {
         
@@ -74,7 +74,7 @@
       }
     };
     
-    btn_register.onclick = e => {
+    form_register.onsubmit = e => {
       e.preventDefault();
       if ([inp_nm2, inp_pw2, inp_pw3].every(i => /[^ ]+/.test(i.value)) &&
           inp_pw2.value === inp_pw3.value) {

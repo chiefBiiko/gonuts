@@ -7,13 +7,19 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <title>chat html</title>
   <style>
+    #contactboard, #chatboard { margin: 0 0 10px 0; border: 1px solid #000; }
     form { margin: 10px 0 0 0; }
     form > input { width: 100%; box-sizing: border-box; margin: 0 0 5px 0; }
+    .online { color: #00ff00; font-weight: 900; }
+    .offline { color: #ff0000; font-weight: 900; }
   </style>
 </head>
 <body>
   
   <h1>CHATROOM</h1>
+  
+    <!-- contact board -->
+  <div id="contactboard"></div>
   
   <!-- chat board -->
   <div id="chatboard"></div>
@@ -36,7 +42,8 @@
     'use strict;'
     
     // DOM objects
-    const board = window.document.getElementById('chatboard');
+    const contactboard = window.document.getElementById('contactboard');
+    const chatboard = window.document.getElementById('chatboard');
     const form_chat = window.document.getElementById('chatform');
     const inp_chat = window.document.getElementById('chatinput');
     const sendbtn = window.document.getElementById('chatbtn');
@@ -45,13 +52,33 @@
     // initialize client connection to server
     const socket = window.io.connect();  // external_ip:65080
     
+    function initChatWith(peer) {
+      
+    }
+    
     // whoami on connect
     socket.on('connect', () => {
       socket.emit('whoami', window.sessionStorage.getItem('myname'));
     });
     
+    socket.on('contacts', json_contacts => {
+      const contacts = JSON.parse(json_contacts);
+      contacts.forEach(c => {
+        const contact = window.document.createElement('div');
+        const button = window.document.createElement('button');
+        button.setAttribute('contactname', c[0]);
+        button.onclick = function(e) {
+          window.alert(`init chat with ${this.contactname}`)
+        };
+        contact.innerHTML = c[0];
+        contact.appendChild(button);
+        contact.classList.add(c[1] ? 'online' : 'offline');
+        contactboard.appendChild(contact);
+      })
+    });
+    
     // in handler
-    socket.on('message', msg => board.innerText += `${msg}\n`);
+    socket.on('message', msg => chatboard.innerText += `${msg}\n`);
     
     // click handler
     form_chat.onsubmit = e => {
@@ -72,7 +99,8 @@
       // show auth/login/enterbtn
     };
     
-    inp_chat.focus();
+    inp_chat.disabled = sendbtn.disabled = true;
+  //inp_chat.focus();
     
   </script>
   

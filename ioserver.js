@@ -7,6 +7,10 @@ const path = require('path');
 
 const db = {
   chiefBiiko: {
+    contacts: ['fraudster', 'gangster'],
+    password: '419'
+  },
+  fraudster: {
     contacts: [],
     password: '419'
   }
@@ -131,9 +135,13 @@ const io = require('socket.io')(server);
 io.on('connection', socket => {
   
   socket.on('whoami', x => {
+    const online = sockets.map(s => s[0]);
+    const x_contacts = db[x].contacts.map(c => online.includes(c) ? 
+      [c, true] : [c, false]);
     sockets.push([x, socket]);
     console.log(`Client: ${x} with socketid ${socket.id}`);
     socket.emit('message', `Hi ${x}`);
+    socket.emit('contacts', JSON.stringify(x_contacts));
   });
   
   socket.on('message', msg => {
@@ -149,7 +157,7 @@ io.on('connection', socket => {
   socket.on('disconnect', () => {
     const username = sockets.filter(s => s[1] === socket)[0][0];
     console.log(`Disconnect:\n ${username}`);
-    sockets = sockets.filter(s => s[0] !== username);
+    sockets = sockets.filter(s => s[0] !== username);  // rather splice
     socket = null;
   });
   
