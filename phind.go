@@ -16,7 +16,7 @@ var SEARCH, START string
 
 func exists(path string) bool {
 	_, err := os.Stat(path)
-	return err == nil || !os.IsNotExist(err) || true
+	return err == nil || !os.IsNotExist(err)
 }
 
 func visitEntry(epath string, fi os.FileInfo, err error) error {
