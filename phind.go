@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-const HELP string = "\nUsage:\tgophind SEARCH [START]\n" +
+const HELP string = "\nUsage:\tphind SEARCH [START]\n" +
 	"SEARCH\tFile or directory name to search for.\n" +
 	"START\tDirectory name where to start searching.\n\n" +
 	"Argument SEARCH can either be a string or match pattern. go docs:\n" +
@@ -20,10 +20,7 @@ func exists(path string) (bool, error) {
 	if err == nil {
 		return true, err
 	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return true, err
+	return false, err
 }
 
 func visitEntry(epath string, fi os.FileInfo, err error) error {
@@ -50,31 +47,20 @@ func visitEntry(epath string, fi os.FileInfo, err error) error {
 }
 
 func main() {
-	if len(os.Args) == 1 {
-		fmt.Println("error: no arguments")
-		fmt.Println(HELP)
+	switch len(os.Args) {
+	case 1:
+		fmt.Println("error: no arguments\n", HELP)
 		os.Exit(1)
-	}
-	SEARCH = os.Args[1]
-	if len(os.Args) == 2 {
-		cwd, err := os.Getwd()
-		if err != nil {
-			fmt.Println("error: os.Getwd() failed")
-			os.Exit(1)
-		}
-		START = cwd
-	} else {
+	case 2:
+		START, _ = os.Getwd()
+	default:
 		START = os.Args[2]
 	}
 	exs, err := exists(START)
-	if err != nil {
-		fmt.Println("error: operating system error")
+	if !exs || err != nil {
+		fmt.Println("error: start directory does not seem to exist\n", HELP)
 		os.Exit(1)
 	}
-	if !exs {
-		fmt.Println("error: start directory does not exist")
-		fmt.Println(HELP)
-		os.Exit(1)
-	}
+	SEARCH = os.Args[1]
 	filepath.Walk(START, visitEntry)
 }
