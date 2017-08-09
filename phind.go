@@ -15,12 +15,9 @@ const HELP string = "\nUsage:\tphind SEARCH [START]\n" +
 
 var SEARCH, START string
 
-func exists(path string) (bool, error) {
+func exists(path string) bool {
 	_, err := os.Stat(path)
-	if err == nil {
-		return true, err
-	}
-	return false, err
+	return err == nil || !os.IsNotExist(err)
 }
 
 func visitEntry(epath string, fi os.FileInfo, err error) error {
@@ -28,17 +25,16 @@ func visitEntry(epath string, fi os.FileInfo, err error) error {
 		fmt.Println("error:", err) // can't walk here
 		return nil                 // but continue walking elsewhere
 	}
-	//if fi.IsDir() { return nil }
 	matched, err := filepath.Match(SEARCH, fi.Name())
 	if err != nil {
 		fmt.Println("error:", err)
-		return err // fatal error, guess execution stops here
+		os.Exit(1)
 	}
 	if matched {
 		apath, err := filepath.Abs(epath)
 		if err != nil {
 			fmt.Println("error:", err)
-			return err
+			os.Exit(1)
 		}
 		fmt.Println(apath)
 		os.Exit(0)
@@ -56,11 +52,12 @@ func main() {
 	default:
 		START = os.Args[2]
 	}
-	exs, err := exists(START)
-	if !exs || err != nil {
+	exs := exists(START)
+	if !exs {
 		fmt.Println("error: start directory does not seem to exist\n", HELP)
 		os.Exit(1)
 	}
 	SEARCH = os.Args[1]
 	filepath.Walk(START, visitEntry)
+	os.Exit(0)
 }
