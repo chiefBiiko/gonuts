@@ -10,6 +10,13 @@ const HELP string = "\nUsage:\tfinfo FILE\n" +
 
 const TMPL string = "%s: %s\nSize: %d bytes\nModTime: %v\n"
 
+// TODO: implementation
+func prettyBytes(numbytes uint) string {
+  if numbytes < 1000 {
+    
+  }
+}
+
 func main() {
 	if len(os.Args) == 1 {
 		fmt.Println("error: no argument")
