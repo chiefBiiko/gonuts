@@ -12,7 +12,11 @@ const TMPL string = "%s: %s\nSize: %d bytes\nModTime: %v\n"
 
 // TODO: implementation
 func prettyBytes(numbytes uint) string {
-  if numbytes < 1000 {
+  if numbytes <= 1000 {  // KB
+    
+  } else if numbytes <= 1000000 {  // MB
+    
+  } else {  // GB  // if numbytes <= 1000000000
     
   }
 }
