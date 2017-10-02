@@ -8,17 +8,17 @@ import (
 const HELP string = "\nUsage:\tfinfo FILE\n" +
 	"FILE\tFile or directory name to display info for."
 
-const TMPL string = "%s: %s\nSize: %d bytes\nModTime: %v\n"
+const TMPL string = "%s: %s\nSize: %s\nModTime: %v\n"
 
 // TODO: implementation
 func prettyBytes(numbytes uint) string {
-  if numbytes <= 1000 {  // KB
-    
-  } else if numbytes <= 1000000 {  // MB
-    
-  } else {  // GB  // if numbytes <= 1000000000
-    
-  }
+	if numbytes <= 1000 { // KB
+		return fmt.Sprintf("%d bytes", numbytes)
+	} else if numbytes <= 1000000 { // MB
+		return fmt.Sprintf("%d MB", numbytes/1000)
+	} else { // GB  // if numbytes <= 1000000000
+		return fmt.Sprintf("%d GB", numbytes/1000000)
+	}
 }
 
 func main() {
