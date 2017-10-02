@@ -11,6 +11,7 @@ const HELP string = "\nUsage:\tfinfo FILE\n" +
 const TMPL string = "%s: %s\nSize: %s\nModTime: %v\n"
 
 // TODO: implementation
+/*
 func prettyBytes(numbytes uint) string {
 	if numbytes <= 1000 { // KB
 		return fmt.Sprintf("%d bytes", numbytes)
@@ -20,6 +21,7 @@ func prettyBytes(numbytes uint) string {
 		return fmt.Sprintf("%d GB", numbytes/1000000)
 	}
 }
+*/
 
 func main() {
 	if len(os.Args) == 1 {
