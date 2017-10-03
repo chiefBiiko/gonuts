@@ -10,18 +10,18 @@ const HELP string = "\nUsage:\tfinfo FILE\n" +
 
 const TMPL string = "%s: %s\nSize: %s\nModTime: %v\n"
 
-// TODO: implementation
-/*
-func prettyBytes(numbytes uint) string {
-	if numbytes <= 1000 { // KB
+// TODO: fix!??!!
+func prettyBytes(numbytes int64) string {
+	if numbytes < 1000 { // bytes
 		return fmt.Sprintf("%d bytes", numbytes)
-	} else if numbytes <= 1000000 { // MB
-		return fmt.Sprintf("%d MB", numbytes/1000)
-	} else { // GB  // if numbytes <= 1000000000
-		return fmt.Sprintf("%d GB", numbytes/1000000)
+	} else if numbytes >= 1000 { // KB
+		return fmt.Sprintf("%v KB", numbytes/1000)
+	} else if numbytes >= 1000000  { // MB
+		return fmt.Sprintf("%v MB", numbytes/1000000)
+	} else {                             // GB
+		return fmt.Sprintf("%v GB", numbytes/1000000000)
 	}
 }
-*/
 
 func main() {
 	if len(os.Args) == 1 {
@@ -41,5 +41,5 @@ func main() {
 	} else {
 		etype = "File"
 	}
-	fmt.Printf(TMPL, etype, name, size, modtime)
+	fmt.Printf(TMPL, etype, name, prettyBytes(size), modtime)
 }
