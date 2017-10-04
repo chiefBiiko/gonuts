@@ -10,16 +10,15 @@ const HELP string = "\nUsage:\tfinfo FILE\n" +
 
 const TMPL string = "%s: %s\nSize: %s\nModTime: %v\n"
 
-// TODO: fix!??!!
 func prettyBytes(numbytes int64) string {
-	if numbytes < 1000 { // bytes
+	if numbytes < 1000 {                       // bytes
 		return fmt.Sprintf("%d bytes", numbytes)
-	} else if numbytes >= 1000 { // KB
-		return fmt.Sprintf("%v KB", numbytes/1000)
-	} else if numbytes >= 1000000  { // MB
-		return fmt.Sprintf("%v MB", numbytes/1000000)
-	} else {                             // GB
-		return fmt.Sprintf("%v GB", numbytes/1000000000)
+	} else if numbytes >= 1000 && numbytes <= 1000000 { // KB
+		return fmt.Sprintf("%.3f KB", float64(numbytes)/float64(1000))
+	} else if numbytes >= 1000000 && numbytes <= 1000000000  { // MB
+		return fmt.Sprintf("%.3f MB", float64(numbytes)/float64(1000000))
+	} else {                                                          // GB
+		return fmt.Sprintf("%.3f GB", float64(numbytes)/float64(1000000000))
 	}
 }
 
