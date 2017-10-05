@@ -1,18 +1,18 @@
-// TODO: use pkg log!!!
 package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 )
 
-const HELP string = "\nUsage:\tfinfo FILE\n" +
-	"FILE\tFile or directory name to display info for."
+const HELP string = "Usage:\tfinfo FILE\n" +
+	"FILE\tFile or directory name to display info for.\n"
 
-const TMPL string = "%s: %s\nSize: %s\nModTime: %v\n"
+const TEMPLATE string = "%s: %s\nSize: %s\nModTime: %s\n"
 
 func prettyBytes(numbytes int64) string {
-	if numbytes < 1000 {                       // bytes
+	if numbytes < 1000 {                      // bytes
 		return fmt.Sprintf("%d bytes", numbytes)
 	} else if numbytes >= 1000 && numbytes <= 1000000 { // KB
 		return fmt.Sprintf("%.3f KB", float64(numbytes)/float64(1000))
@@ -25,21 +25,18 @@ func prettyBytes(numbytes int64) string {
 
 func main() {
 	if len(os.Args) == 1 {
-		fmt.Println("error: no argument")
-		fmt.Println(HELP)
-		os.Exit(1)
+		log.Fatalf("error: no argument\n%s", HELP)
 	}
 	fi, err := os.Stat(os.Args[1])
 	if err != nil {
-		fmt.Println("error:", err)
-		os.Exit(1)
+		log.Fatalf("error: %v\n", err)
 	}
-	name, size, modtime := fi.Name(), fi.Size(), fi.ModTime()
-	var etype string
+	var ftype string
 	if fi.IsDir() {
-		etype = "Directory"
+		ftype = "Directory"
 	} else {
-		etype = "File"
+		ftype = "File"
 	}
-	fmt.Printf(TMPL, etype, name, prettyBytes(size), modtime)
+	fmt.Printf(TEMPLATE,
+	  ftype, fi.Name(), prettyBytes(fi.Size()), fi.ModTime().UTC().String())
 }
