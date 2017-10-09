@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 const HELP string = "Usage:\tfinfo FILE\n" +
@@ -31,6 +32,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %v\n", err)
 	}
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("error: %v\n", err)
+	}
+	var fpath string = filepath.Join(cwd, os.Args[1])
 	var ftype string
 	if fi.IsDir() {
 		ftype = "Directory"
@@ -38,5 +44,5 @@ func main() {
 		ftype = "File"
 	}
 	fmt.Printf(TEMPLATE,
-	  ftype, fi.Name(), prettyBytes(fi.Size()), fi.ModTime().UTC().String())
+	  ftype, fpath, prettyBytes(fi.Size()), fi.ModTime().UTC().String())
 }
