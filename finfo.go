@@ -2,15 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 )
-
-const HELP string = "Usage:\tfinfo FILE\n" +
-	"FILE\tFile or directory name to display info for.\n"
-
-const TEMPLATE string = "%s: %s\nSize: %s\nModTime: %s\n"
 
 func prettyBytes(numbytes int64) string {
 	if numbytes < 1000 {                      // bytes
@@ -26,15 +20,17 @@ func prettyBytes(numbytes int64) string {
 
 func main() {
 	if len(os.Args) == 1 {
-		log.Fatalf("error: no argument\n%s", HELP)
+		fmt.Fprint(os.Stderr, "error: no argument\nUsage:\tfinfo FILE\n" +
+			           "FILE\tFile or directory name to display info for.\n")
+	  os.Exit(1)
 	}
 	fi, err := os.Stat(os.Args[1])
 	if err != nil {
-		log.Fatalf("error: %v\n", err)
+		panic(err)
 	}
 	cwd, err := os.Getwd()
 	if err != nil {
-		log.Fatalf("error: %v\n", err)
+		panic(err)
 	}
 	var fpath string = filepath.Join(cwd, os.Args[1])
 	var ftype string
@@ -43,6 +39,6 @@ func main() {
 	} else {
 		ftype = "File"
 	}
-	fmt.Printf(TEMPLATE,
+	fmt.Printf("%s: %s\nSize: %s\nModTime: %s\n",
 	  ftype, fpath, prettyBytes(fi.Size()), fi.ModTime().UTC().String())
 }
